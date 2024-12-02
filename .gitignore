@@ -1,0 +1,53 @@
+# .gitignore
+
+# Java & Maven
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+target/
+
+# Logs
+logs/
+*.log
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Package Files
+*.zip
+*.tar.gz
+*.rar
+
+# JWT keys (optional, if any keys are stored)
+*.pem
+
+# Spring Boot Files
+*.h2.db
+
+# Environment Variables
+.env
+
+# Generated files
+mvnw
+dist/
+
+# Docker
+*.env
+docker-compose.override.yml
