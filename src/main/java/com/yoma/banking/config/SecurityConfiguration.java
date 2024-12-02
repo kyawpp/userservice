@@ -1,5 +1,6 @@
 package com.yoma.banking.config;
 
+import com.yoma.banking.filter.JwtRequestFilter;
 import com.yoma.banking.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
 @EnableWebSecurity
@@ -20,9 +23,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
 
     private final CustomUserDetailsService customUserDetailsService;
+    private final JwtRequestFilter jwtRequestFilter;
 
-    public SecurityConfiguration(CustomUserDetailsService customUserDetailsService) {
+    @Autowired
+    public SecurityConfiguration(CustomUserDetailsService customUserDetailsService, JwtRequestFilter jwtRequestFilter) {
         this.customUserDetailsService = customUserDetailsService;
+        this.jwtRequestFilter = jwtRequestFilter;
     }
 
     @Bean
@@ -30,9 +36,11 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/login", "/api/users").permitAll() // Allow unauthenticated access to login and registration
+                        .requestMatchers("/api/auth/login", "/api/users").permitAll()
+                        .requestMatchers("/api/accounts/**").hasAuthority("ROLE_USER")
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(AbstractHttpConfigurer::disable);
 
         return http.build();

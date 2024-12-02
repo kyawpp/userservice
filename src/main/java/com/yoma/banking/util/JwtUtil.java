@@ -5,10 +5,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -42,10 +41,9 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, List<String> roles) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", "USER");
-        claims.put("permissions", "READ,WRITE");
+        claims.put("role", roles);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -55,6 +53,7 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
+
 
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
@@ -72,6 +71,24 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
+
+    public List<String> extractRoles(String token) {
+        Claims claims = extractAllClaims(token);
+        Object rolesObject = claims.get("role");
+
+        if (rolesObject instanceof List<?> roles) {
+            List<String> roleList = roles.stream()
+                    .filter(role -> role instanceof String)
+                    .map(role -> (String) role)
+                    .collect(Collectors.toList());
+            System.out.println("Extracted roles from JWT: " + roleList);
+            return roleList;
+        }
+
+        System.out.println("No roles found in JWT");
+        return new ArrayList<>();
+    }
+
 
 
     public Boolean validateToken(String token, String username) {

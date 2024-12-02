@@ -11,6 +11,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
@@ -36,11 +39,13 @@ public class AuthenticationController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
-        String accessToken = jwtUtil.generateToken(authenticationRequest.getEmail());
-
+        // Assuming user has a role "USER"
+        List<String> roles = Collections.singletonList("USER");
+        String accessToken = jwtUtil.generateToken(authenticationRequest.getEmail(), roles);
         String refreshToken = jwtUtil.generateRefreshToken(authenticationRequest.getEmail());
 
         AuthenticationResponse response = new AuthenticationResponse(accessToken, refreshToken);
         return ResponseEntity.ok(response);
     }
+
 }
