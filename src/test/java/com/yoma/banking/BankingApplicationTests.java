@@ -1,9 +1,6 @@
 package com.yoma.banking;
 
-import com.yoma.banking.service.AccountService;
-import com.yoma.banking.service.CustomUserDetailsService;
-import com.yoma.banking.service.TransactionService;
-import com.yoma.banking.service.UserService;
+import com.yoma.banking.service.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,6 +18,9 @@ class BankingApplicationTests {
 
 	@MockBean
 	private TransactionService transactionService;
+
+	@MockBean
+	private AccountBalanceValidator accountBalanceValidator;
 
 	@Test
 	void contextLoads() {
