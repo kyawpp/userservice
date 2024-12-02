@@ -41,9 +41,10 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username, List<String> roles) {
+    public String generateToken(String userId, String username, List<String> roles) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", roles);
+        claims.put("userId", userId);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -61,8 +62,10 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
     }
 
-    public String generateRefreshToken(String username) {
+    public String generateRefreshToken(String userId, String username, List<String> roles) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", roles);
+        claims.put("userId", userId);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)

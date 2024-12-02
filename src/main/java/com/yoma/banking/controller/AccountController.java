@@ -27,6 +27,7 @@ public class AccountController {
                                                 @RequestBody @Valid AccountDto accountDto) {
         String token = authorizationHeader.substring(7);
         String userId = jwtUtil.extractUserId(token);
+        System.out.println("userId: " + userId);
 
         accountService.createAccount(accountDto, userId);
 

@@ -2,6 +2,7 @@ package com.yoma.banking.controller;
 
 import com.yoma.banking.dto.AuthenticationRequest;
 import com.yoma.banking.dto.AuthenticationResponse;
+import com.yoma.banking.model.User;
 import com.yoma.banking.service.UserService;
 import com.yoma.banking.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +40,20 @@ public class AuthenticationController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
+        String email = authenticationRequest.getEmail();
+        User user = userService.findUserByEmail(email);
+        String userId = user.getUserId();
+
         // Assuming user has a role "USER"
         List<String> roles = Collections.singletonList("USER");
-        String accessToken = jwtUtil.generateToken(authenticationRequest.getEmail(), roles);
-        String refreshToken = jwtUtil.generateRefreshToken(authenticationRequest.getEmail());
+
+        // Generate access token and refresh token with userId
+        String accessToken = jwtUtil.generateToken(userId, email, roles);
+        String refreshToken = jwtUtil.generateRefreshToken(userId, email, roles);
 
         AuthenticationResponse response = new AuthenticationResponse(accessToken, refreshToken);
         return ResponseEntity.ok(response);
     }
+
 
 }
