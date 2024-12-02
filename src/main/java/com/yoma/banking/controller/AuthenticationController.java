@@ -36,7 +36,11 @@ public class AuthenticationController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
-        final String jwt = jwtUtil.generateToken(authenticationRequest.getEmail());
-        return ResponseEntity.ok(new AuthenticationResponse(jwt,""));
+        String accessToken = jwtUtil.generateToken(authenticationRequest.getEmail());
+
+        String refreshToken = jwtUtil.generateRefreshToken(authenticationRequest.getEmail());
+
+        AuthenticationResponse response = new AuthenticationResponse(accessToken, refreshToken);
+        return ResponseEntity.ok(response);
     }
 }
