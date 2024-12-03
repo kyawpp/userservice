@@ -43,6 +43,7 @@ Thumbs.db
 
 # Environment Variables
 .env
+application.properties
 
 # Generated files
 mvnw
