@@ -1,0 +1,13 @@
+spring.application.name=banking
+spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.main.allow-bean-definition-overriding=true
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
+jwt.secret=${JWT_SECRET}
+jwt.token-expiration=${JWT_TOKEN_EXPIRATION}
+jwt.refresh-token-expiration=${JWT_REFRESH_TOKEN_EXPIRATION}
