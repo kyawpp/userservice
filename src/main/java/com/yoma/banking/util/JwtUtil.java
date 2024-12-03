@@ -82,15 +82,12 @@ public class JwtUtil {
         Object rolesObject = claims.get("role");
 
         if (rolesObject instanceof List<?> roles) {
-            List<String> roleList = roles.stream()
+            return roles.stream()
                     .filter(role -> role instanceof String)
                     .map(role -> (String) role)
                     .collect(Collectors.toList());
-            System.out.println("Extracted roles from JWT: " + roleList);
-            return roleList;
         }
 
-        System.out.println("No roles found in JWT");
         return new ArrayList<>();
     }
 
