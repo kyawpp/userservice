@@ -8,3 +8,4 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
 spring.main.allow-bean-definition-overriding=true
 logging.level.org.hibernate.SQL=DEBUG
 logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
+jwt.secret=your-secret-key-goes-here
