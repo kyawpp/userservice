@@ -53,11 +53,7 @@ To run the application in Docker:
 
 1. Build the Docker image:
    ```
-   docker build -t banking-app .
-   ```
-2. Run the Docker container:
-   ```
-   docker run -p 8080:8080 banking-app
+   docker-compose up --build
    ```
 
 ## API Endpoints
@@ -65,7 +61,8 @@ To run the application in Docker:
 - `POST /api/users` - Register a new user
 - `POST /api/auth/login` - Login and receive JWT tokens
 - `POST /api/accounts` - Create a new account (requires authentication)
-- `GET /api/accounts/{id}` - Get account details (requires authentication)
+- `POST /api/transactions` - Create a new transaction (requires authentication)
+- `GET /api/transactions` - Get transaction history (requires authentication)
 
 ## Testing
 
