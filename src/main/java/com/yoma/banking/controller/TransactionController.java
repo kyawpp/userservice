@@ -1,6 +1,7 @@
 package com.yoma.banking.controller;
 
 import com.yoma.banking.dto.TransactionDto;
+import com.yoma.banking.dto.TransactionHistoryRequest;
 import com.yoma.banking.model.Transaction;
 import com.yoma.banking.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -33,8 +35,12 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<List<Transaction>> getTransactionHistory(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate) {
-        return ResponseEntity.ok(transactionService.getTransactionHistory(fromDate, toDate));
+            @RequestHeader("Authorization") String token,
+            @Valid @RequestBody TransactionHistoryRequest request) {
+        LocalDateTime fromDate = request.getFromDate().atStartOfDay();
+        LocalDateTime toDate = request.getToDate().atTime(LocalTime.MAX);
+
+        List<Transaction> transactions = transactionService.getTransactionHistory(fromDate, toDate);
+        return ResponseEntity.ok(transactions);
     }
 }
