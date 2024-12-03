@@ -13,8 +13,14 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtil {
 
-    @Value( "${jwt.secret}")
+    @Value("${jwt.secret}")
     private String secretKey;
+
+    @Value("${jwt.token-expiration}")
+    private long tokenExpiration;  // Change type to long
+
+    @Value("${jwt.refresh-token-expiration}")
+    private long refreshTokenExpiration;  // Change type to long
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -24,7 +30,6 @@ public class JwtUtil {
         Claims claims = extractAllClaims(token);
         return claims.get("userId", String.class);
     }
-
 
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
@@ -36,7 +41,10 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -44,37 +52,30 @@ public class JwtUtil {
     }
 
     public String generateToken(String userId, String username, List<String> roles) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", roles);
-        claims.put("userId", userId);
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours validity
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
-    }
-
-
-    private String createToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
-                .signWith(SignatureAlgorithm.HS256, secretKey).compact();
+        Map<String, Object> claims = buildClaims(userId, roles);
+        return generateTokenWithClaims(claims, username, tokenExpiration);
     }
 
     public String generateRefreshToken(String userId, String username, List<String> roles) {
+        Map<String, Object> claims = buildClaims(userId, roles);
+        return generateTokenWithClaims(claims, username, refreshTokenExpiration);
+    }
+
+    private String generateTokenWithClaims(Map<String, Object> claims, String subject, long expiration) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+    }
+
+    private Map<String, Object> buildClaims(String userId, List<String> roles) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", roles);
         claims.put("userId", userId);
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7)) // 7 days validity for refresh token
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+        return claims;
     }
 
     public List<String> extractRoles(String token) {
@@ -90,8 +91,6 @@ public class JwtUtil {
 
         return new ArrayList<>();
     }
-
-
 
     public Boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
